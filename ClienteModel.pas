@@ -1,4 +1,4 @@
-unit Model.Cliente;
+unit ClienteModel;
 
 interface
 
@@ -30,14 +30,12 @@ var
   Query: TFDQuery;
 begin
   Result := False;
-
   Query := TFDQuery.Create(nil);
   try
     Query.Connection := dm.conexao;
     Query.SQL.Text := 'SELECT * FROM Clientes WHERE Valido = 1 AND Codigo = :Codigo';
     Query.ParamByName('Codigo').AsInteger := Codigo;
     Query.Open;
-
     if not Query.IsEmpty then
     begin
       FCodigo := Query.FieldByName('Codigo').AsInteger;

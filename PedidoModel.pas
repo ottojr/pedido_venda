@@ -29,11 +29,11 @@ begin
   FDQuery := TFDQuery.Create(nil);
   try
     FDQuery.Connection := FConnection;
-    FDQuery.SQL.Text := 'INSERT INTO Pedidos (DataEmissao, Codigo_Cliente, ValorTotal) ' +
+    FDQuery.SQL.Text := 'INSERT INTO Pedidos (Data_Emissao, Codigo_Cliente, Valor_Total) ' +
                         'VALUES (:DataEmissao, :CodigoCliente, :ValorTotal)';
-    FDQuery.ParamByName('DataEmissao').AsDateTime := Now;
+    FDQuery.ParamByName('DataEmissao').AsDateTime  := Now;
     FDQuery.ParamByName('CodigoCliente').AsInteger := CodigoCliente;
-    FDQuery.ParamByName('ValorTotal').AsFloat := ValorTotal;
+    FDQuery.ParamByName('ValorTotal').AsFloat      := ValorTotal;
     FDQuery.ExecSQL;
 
     // Retornar o ID do pedido recém-criado

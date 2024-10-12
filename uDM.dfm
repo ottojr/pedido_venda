@@ -8,7 +8,6 @@ object DM: TDM
       'Password=root'
       'CharacterSet=utf8'
       'Server=localhost'
-      'UseSSL=True'
       'DriverID=MySQL')
     LoginPrompt = False
     Left = 80

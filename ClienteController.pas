@@ -1,9 +1,8 @@
-unit Controller.Cliente;
+unit ClienteController;
 
 interface
 
-uses
-  Model.Cliente;
+uses ClienteModel;
 
 type
   TClienteController = class
