@@ -33,7 +33,8 @@ begin
   Query := TFDQuery.Create(nil);
   try
     Query.Connection := dm.conexao;
-    Query.SQL.Text := 'SELECT * FROM Clientes WHERE Valido = 1 AND Codigo = :Codigo';
+    Query.SQL.Text :=
+      'SELECT Codigo, Nome, Cidade, UF FROM Clientes WHERE Codigo = :Codigo';
     Query.ParamByName('Codigo').AsInteger := Codigo;
     Query.Open;
     if not Query.IsEmpty then
@@ -50,4 +51,3 @@ begin
 end;
 
 end.
-

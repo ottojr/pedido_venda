@@ -1,6 +1,7 @@
 object DM: TDM
-  Height = 480
-  Width = 640
+  Height = 600
+  Width = 800
+  PixelsPerInch = 120
   object conexao: TFDConnection
     Params.Strings = (
       'Database=dbvarejo'
@@ -10,16 +11,16 @@ object DM: TDM
       'Server=localhost'
       'DriverID=MySQL')
     LoginPrompt = False
-    Left = 80
-    Top = 40
+    Left = 100
+    Top = 50
   end
   object FDPhysMySQLDriverLink1: TFDPhysMySQLDriverLink
-    Left = 56
-    Top = 112
+    Left = 70
+    Top = 140
   end
   object FDGUIxWaitCursor1: TFDGUIxWaitCursor
     Provider = 'Forms'
-    Left = 88
-    Top = 112
+    Left = 110
+    Top = 140
   end
 end

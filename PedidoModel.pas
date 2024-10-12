@@ -12,7 +12,8 @@ type
   public
     constructor Create(AConnection: TFDConnection);
     function GravarPedido(CodigoCliente: Integer; ValorTotal: Double): Integer;
-    procedure GravarItemPedido(PedidoID, CodigoProduto: Integer; Quantidade, ValorUnitario, ValorTotal: Double);
+    procedure GravarItemPedido(PedidoID, CodigoProduto: Integer;
+      Quantidade, ValorUnitario, ValorTotal: Double);
   end;
 
 implementation
@@ -22,18 +23,20 @@ begin
   FConnection := AConnection;
 end;
 
-function TPedidoModel.GravarPedido(CodigoCliente: Integer; ValorTotal: Double): Integer;
+function TPedidoModel.GravarPedido(CodigoCliente: Integer;
+  ValorTotal: Double): Integer;
 var
   FDQuery: TFDQuery;
 begin
   FDQuery := TFDQuery.Create(nil);
   try
     FDQuery.Connection := FConnection;
-    FDQuery.SQL.Text := 'INSERT INTO Pedidos (Data_Emissao, Codigo_Cliente, Valor_Total) ' +
-                        'VALUES (:DataEmissao, :CodigoCliente, :ValorTotal)';
-    FDQuery.ParamByName('DataEmissao').AsDateTime  := Now;
+    FDQuery.SQL.Text :=
+      'INSERT INTO Pedidos (Data_Emissao, Codigo_Cliente, Valor_Total) ' +
+      'VALUES (:DataEmissao, :CodigoCliente, :ValorTotal)';
+    FDQuery.ParamByName('DataEmissao').AsDateTime := Now;
     FDQuery.ParamByName('CodigoCliente').AsInteger := CodigoCliente;
-    FDQuery.ParamByName('ValorTotal').AsFloat      := ValorTotal;
+    FDQuery.ParamByName('ValorTotal').AsFloat := ValorTotal;
     FDQuery.ExecSQL;
 
     // Retornar o ID do pedido recém-criado
@@ -43,19 +46,22 @@ begin
   end;
 end;
 
-procedure TPedidoModel.GravarItemPedido(PedidoID, CodigoProduto: Integer; Quantidade, ValorUnitario, ValorTotal: Double);
+procedure TPedidoModel.GravarItemPedido(PedidoID, CodigoProduto: Integer;
+  Quantidade, ValorUnitario, ValorTotal: Double);
 var
   FDQuery: TFDQuery;
 begin
   FDQuery := TFDQuery.Create(nil);
   try
     FDQuery.Connection := FConnection;
-    FDQuery.SQL.Text := 'INSERT INTO Pedidos_Produtos (Id_Pedido, Codigo_Produto, Quantidade, Valor_Unitario) ' +
-                        'VALUES (:NumeroPedido, :CodigoProduto, :Quantidade, :ValorUnitario)';
+    FDQuery.SQL.Text :=
+      'INSERT INTO Pedidos_Produtos (Id_Pedido, Codigo_Produto, Quantidade, Valor_Unitario, Valor_Total) '
+      + 'VALUES (:NumeroPedido, :CodigoProduto, :Quantidade, :ValorUnitario, :ValorTotal)';
     FDQuery.ParamByName('NumeroPedido').AsInteger := PedidoID;
     FDQuery.ParamByName('CodigoProduto').AsInteger := CodigoProduto;
     FDQuery.ParamByName('Quantidade').AsFloat := Quantidade;
     FDQuery.ParamByName('ValorUnitario').AsFloat := ValorUnitario;
+    FDQuery.ParamByName('ValorTotal').AsFloat := ValorTotal;
     FDQuery.ExecSQL;
   finally
     FDQuery.Free;
@@ -63,4 +69,3 @@ begin
 end;
 
 end.
-

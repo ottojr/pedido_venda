@@ -28,7 +28,8 @@ begin
   FDQuery := TFDQuery.Create(nil);
   try
     FDQuery.Connection := FConnection;
-    FDQuery.SQL.Text := 'SELECT * FROM Produtos WHERE Valido = 1 AND Codigo = :Codigo';
+    FDQuery.SQL.Text :=
+      'SELECT Codigo, Descricao, Preco_Venda FROM Produtos WHERE Codigo = :Codigo';
     FDQuery.ParamByName('Codigo').AsInteger := CodigoProduto;
     FDQuery.Open;
 
@@ -43,4 +44,3 @@ begin
 end;
 
 end.
-

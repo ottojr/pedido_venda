@@ -35,16 +35,16 @@ type
     Label2: TLabel;
     btnAdicionarProduto: TSpeedButton;
     btnExcluirProduto: TSpeedButton;
-    Panel1: TPanel;
-    btnGravarPedido: TSpeedButton;
     tblPedido: TFDMemTable;
     tblPedidoCodigo_Produto: TIntegerField;
     tblPedidoProduto: TStringField;
     tblPedidoQuantidade: TFloatField;
     tblPedidoValor_Unitario: TFloatField;
     tblPedidoValor_Total: TFloatField;
-    lblProduto: TLabel;
     StatusBar1: TStatusBar;
+    edtNomeProduto: TEdit;
+    Label3: TLabel;
+    btnGravarPedido: TSpeedButton;
     procedure FormCreate(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure btnPesquisarClienteClick(Sender: TObject);
@@ -58,6 +58,13 @@ type
     procedure GridProdutosKeyDown(Sender: TObject; var Key: Word;
       Shift: TShiftState);
     procedure btnGravarPedidoClick(Sender: TObject);
+    procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure edtCodProdutoKeyDown(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
+    procedure edtPrecoUnitarioKeyDown(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
+    procedure edtQuantidadeKeyDown(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
   private
     { Private declarations }
     FEditandoProduto: Boolean;
@@ -74,6 +81,7 @@ type
 
 var
   frmPrincipal: TfrmPrincipal;
+  bkm: TBookmark;
 
 implementation
 
@@ -91,6 +99,7 @@ end;
 procedure TfrmPrincipal.LimpaDadosCliente;
 begin
   edtCodCliente.Text          := '';
+  edtNomeProduto.Text         := '';
   lblNomeCliente.Caption      := '';
   lblCidade_UFCliente.Caption := '';
 end;
@@ -98,7 +107,6 @@ end;
 procedure TfrmPrincipal.LimpaDadosProduto;
 begin
   edtCodProduto.Text    := '';
-  lblProduto.Caption    := '';
   edtQuantidade.Text    := '';
   edtPrecoUnitario.Text := '0,00';
 end;
@@ -111,65 +119,95 @@ begin
   tblPedido.First;
   while not tblPedido.Eof do
   begin
-    lrValorTotal := lrValorTotal + tblPedido.FieldByName('Valor_Total').AsFloat;
+    lrValorTotal := lrValorTotal + (tblPedido.FieldByName('Valor_Unitario').AsFloat * tblPedido.FieldByName('Quantidade').AsFloat);
     tblPedido.Next;
   end;
   StatusBar1.Panels[0].Text := 'Valor total: ' + FormatFloat('###,##0.00', lrValorTotal);
   StatusBar1.Update;
 end;
+
 procedure TfrmPrincipal.btnAdicionarProdutoClick(Sender: TObject);
 var
   Cliente: TCliente;
   CodigoCliente: Integer;
   ClienteController : TClienteController;
 begin
-  if Length(trim(edtCodCliente.Text)) = 0 then
+  if not tblPedido.Active then
+    tblPedido.Open;
+
+  // Verifica se está no modo de edição ou inserção
+  if FEditandoProduto then
   begin
-    ShowMessage('Falta informar um código de cliente.');
-    edtCodCliente.SetFocus;
-    exit;
-  end;
-
-  if Length(trim(edtCodProduto.Text)) = 0 then
-  begin
-    ShowMessage('Falta informar um código de produto.');
-    edtCodProduto.SetFocus;
-    exit;
-  end;
-
-  // Validando a informação em edtCodCliente
-  btnPesquisarClienteClick(Self);
-
-  try
-    if not tblPedido.Active then
-      tblPedido.Open;
-
-    // Verifica se está no modo de edição ou inserção
-    if FEditandoProduto then
+    // Editar o produto no grid
+    if tblPedido.Locate('Codigo_Produto', FCodigoProdutoEdicao, []) then
     begin
-      // Editar o produto no grid
-      if tblPedido.Locate('Codigo_Produto', FCodigoProdutoEdicao, []) then
-      begin
-        tblPedido.Edit;
-        tblPedidoQuantidade.Value     := StrToFloat(edtQuantidade.Text);
-        tblPedidoValor_Unitario.Value := StrToFloat(edtPrecoUnitario.Text);
-        tblPedidoValor_Total.Value    := tblPedidoQuantidade.Value * tblPedidoValor_Unitario.Value;
-        tblPedido.Post;
-        FEditandoProduto := False; // Sai do modo de edição
-      end;
-    end
-    else
-    begin
-      // Adicionar um novo produto
-      tblPedido.Append;
-      tblPedidoCodigo_Produto.Value := StrToInt(edtCodProduto.Text);
-      tblPedidoProduto.Value        := lblProduto.Caption;
-      tblPedidoQuantidade.Value     := StrToFloat(edtQuantidade.Text);
-      tblPedidoValor_Unitario.Value := StrToFloat(edtPrecoUnitario.Text);
-      tblPedidoValor_Total.Value    := tblPedidoQuantidade.Value * tblPedidoValor_Unitario.Value;
+      tblPedido.Edit;
+      tblPedidoValor_Total.Value := tblPedidoQuantidade.Value * tblPedidoValor_Unitario.Value;
       tblPedido.Post;
-    end;      
-  finally
+      FEditandoProduto := False; // Sai do modo de edição
+      AtualizaValorTotal;
+      if GridProdutos.DataSource.Dataset.BookmarkValid(bkm) then
+      begin
+        GridProdutos.DataSource.Dataset.GotoBookmark(bkm);
+      end;
+    end;
+  end
+  else
+  begin
+    if Length(trim(edtCodCliente.Text)) = 0 then
+    begin
+      ShowMessage('Falta informar um código de cliente.');
+      edtCodCliente.SetFocus;
+      exit;
+    end;
+
+    if Length(trim(edtCodProduto.Text)) = 0 then
+    begin
+      ShowMessage('Falta informar um código de produto.');
+      edtCodProduto.SetFocus;
+      exit;
+    end;
+
+    if Length(trim(edtQuantidade.Text)) = 0 then
+    begin
+      ShowMessage('Falta informar a quantidade do produto.');
+      edtQuantidade.SetFocus;
+      exit;
+    end;
+
+    if StrToFloat(edtQuantidade.Text) <= 0 then
+    begin
+      ShowMessage('A quantidade deve ser maior que zero.');
+      edtQuantidade.SetFocus;
+      exit;
+    end;
+
+    if Length(trim(edtPrecoUnitario.Text)) = 0 then
+    begin
+      ShowMessage('Falta informar o preço unitário do produto.');
+      edtPrecoUnitario.SetFocus;
+      exit;
+    end;
+
+    if StrToInt(edtPrecoUnitario.Text) <= 0 then
+    begin
+      ShowMessage('O preço unitário deve ser maior que zero.');
+      edtPrecoUnitario.SetFocus;
+      exit;
+    end;
+
+    // Validando a informação em edtCodCliente
+    btnPesquisarClienteClick(Self);
+
+    // Adicionar um novo produto
+    tblPedido.Append;
+    tblPedidoCodigo_Produto.Value := StrToInt(edtCodProduto.Text);
+    tblPedidoProduto.Value        := edtNomeProduto.Text;
+    tblPedidoQuantidade.Value     := StrToFloat(edtQuantidade.Text);
+    tblPedidoValor_Unitario.Value := StrToFloat(edtPrecoUnitario.Text);
+    tblPedidoValor_Total.Value    := tblPedidoQuantidade.Value * tblPedidoValor_Unitario.Value;
+    tblPedido.Post;
+
     AtualizaValorTotal;
     edtCodProduto.SetFocus;
   end;
@@ -191,7 +229,7 @@ begin
   if not FileExists(lslibmysql) then
   begin
     try
-      rs     := TResourceStream.Create(hInstance, 'RC1', RT_RCDATA);
+      rs     := TResourceStream.Create(hInstance, 'RC01', RT_RCDATA);
       lsFile := lslibmysql;
       fs     := TFileStream.Create(lsFile,fmCreate);
       rs.SaveToStream(fs);
@@ -252,6 +290,19 @@ begin
   LimpaDadosProduto;
 end;
 
+procedure TfrmPrincipal.FormKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+   case key of
+     vk_F3: begin
+               btnPesquisarClienteClick(Self);
+            end;
+     vk_F4: begin
+               btnPesquisarProdutoClick(Self);
+            end;
+   end;
+end;
+
 procedure TfrmPrincipal.btnExcluirProdutoClick(Sender: TObject);
 begin
   if not tblPedido.IsEmpty then
@@ -269,6 +320,10 @@ end;
 procedure TfrmPrincipal.btnGravarPedidoClick(Sender: TObject);
 begin
   GravarVenda;
+  tblPedido.EmptyDataSet;
+  LimpaDadosProduto;
+  LimpaDadosCliente;
+  edtCodCliente.SetFocus;
 end;
 
 procedure TfrmPrincipal.btnPesquisarClienteClick(Sender: TObject);
@@ -319,7 +374,7 @@ begin
 
       if Assigned(QueryProduto) then
       begin
-        lblProduto.Caption    := QueryProduto.FieldByName('Descricao').AsString;
+        edtNomeProduto.Text   := QueryProduto.FieldByName('Descricao').AsString;
         edtPrecoUnitario.Text := QueryProduto.FieldByName('Preco_Venda').AsString;
       end;
     except
@@ -348,6 +403,33 @@ begin
    end;
 end;
 
+procedure TfrmPrincipal.edtCodProdutoKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+   if Key = 13 then
+   begin
+     btnPesquisarProdutoClick(self);
+   end;
+end;
+
+procedure TfrmPrincipal.edtPrecoUnitarioKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+   if Key = 13 then
+   begin
+     btnAdicionarProdutoClick(Self);
+   end;
+end;
+
+procedure TfrmPrincipal.edtQuantidadeKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  if Key = 13 then
+  begin
+    btnAdicionarProdutoClick(Self);
+  end;
+end;
+
 procedure TfrmPrincipal.tblPedidoCalcFields(DataSet: TDataSet);
 begin
   if tblPedidoQuantidade.AsFloat > 0 then
@@ -374,7 +456,7 @@ begin
   if not dsPedido.DataSet.Active then
     Exit;
 
-  // Inicializar o array de produtos com base no grid
+  // Inicializar o array de produtos
   SetLength(Produtos, dsPedido.DataSet.RecordCount);
   dsPedido.DataSet.First;
   I := 0;
@@ -408,18 +490,15 @@ begin
       exit;
     btnExcluirProdutoClick(Self);
   end
-  else if (Key = VK_RETURN) AND (not tblPedidoCodigo_Produto.IsNull) then
+  else if ((Key = VK_RETURN) or (Key = VK_TAB)) AND (not tblPedidoCodigo_Produto.IsNull) then
   begin
-    // Muda para o modo de edição
-    FEditandoProduto      := True;
-    FCodigoProdutoEdicao  := tblPedidoCodigo_Produto.Value;
-    edtCodProduto.Text    := IntToStr(tblPedidoCodigo_Produto.Value);
-    lblProduto.Caption    := tblPedidoProduto.Value;
-    edtQuantidade.Text    := FloatToStr(tblPedidoQuantidade.Value);
-    edtPrecoUnitario.Text := FloatToStr(tblPedidoValor_Unitario.Value);
-
-    Key := 0; // Previne o comportamento padrão da tecla Enter no grid
-  end;  
+    // Entra no modo de edição
+    FEditandoProduto := True;
+    FCodigoProdutoEdicao := tblPedidoCodigo_Produto.AsInteger;
+    Key := 0; // Previne o comportamento padrão do Enter no grid
+    bkm := GridProdutos.DataSource.DataSet.GetBookmark;
+    btnAdicionarProdutoClick(self);
+  end;
 end;
 
 end.

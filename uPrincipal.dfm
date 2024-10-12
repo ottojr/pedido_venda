@@ -4,27 +4,29 @@ object frmPrincipal: TfrmPrincipal
   BorderIcons = [biSystemMenu, biMinimize]
   BorderStyle = bsSingle
   Caption = 'Tela Principal de Pedido'
-  ClientHeight = 342
-  ClientWidth = 427
+  ClientHeight = 406
+  ClientWidth = 416
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -12
   Font.Name = 'Segoe UI'
   Font.Style = []
-  Position = poDesktopCenter
+  KeyPreview = True
+  Position = poMainFormCenter
   OnClose = FormClose
   OnCreate = FormCreate
+  OnKeyDown = FormKeyDown
   TextHeight = 15
   object GroupBox1: TGroupBox
     Left = 0
     Top = 0
-    Width = 427
+    Width = 416
     Height = 57
     Align = alTop
-    Caption = 'Cliente'
+    Caption = 'Dados do Cliente - F3 Buscar Cliente'
     TabOrder = 0
-    ExplicitWidth = 411
+    ExplicitWidth = 425
     object lblCodCliente: TLabel
       Left = 8
       Top = 24
@@ -124,22 +126,21 @@ object frmPrincipal: TfrmPrincipal
   object GroupBox2: TGroupBox
     Left = 0
     Top = 57
-    Width = 427
-    Height = 106
+    Width = 416
+    Height = 153
     Align = alTop
-    Caption = 'Produto'
+    Caption = 'Produto - F4 Buscar Produto'
     TabOrder = 1
-    ExplicitWidth = 415
     object lblCodProduto: TLabel
-      Left = 8
-      Top = 22
+      Left = 10
+      Top = 27
       Width = 39
       Height = 15
       Caption = 'C'#243'digo'
     end
     object btnPesquisarProduto: TSpeedButton
-      Left = 119
-      Top = 19
+      Left = 76
+      Top = 46
       Width = 23
       Height = 22
       Glyph.Data = {
@@ -202,25 +203,26 @@ object frmPrincipal: TfrmPrincipal
       OnClick = btnPesquisarProdutoClick
     end
     object Label1: TLabel
-      Left = 53
-      Top = 55
+      Left = 10
+      Top = 73
       Width = 62
       Height = 15
       Caption = 'Quantidade'
     end
     object Label2: TLabel
-      Left = 158
-      Top = 56
+      Left = 112
+      Top = 74
       Width = 71
       Height = 15
       Caption = 'Valor Unit'#225'rio'
     end
     object btnAdicionarProduto: TSpeedButton
-      Left = 255
-      Top = 74
-      Width = 25
+      Left = 203
+      Top = 92
+      Width = 90
       Height = 25
       Hint = 'Clique aqui para adicionar o produto'
+      Caption = '&Adicionar'
       Glyph.Data = {
         B60D0000424DB60D000000000000360000002800000030000000180000000100
         180000000000800D000000000000000000000000000000000000FFFFFFFFFFFF
@@ -336,11 +338,12 @@ object frmPrincipal: TfrmPrincipal
       OnClick = btnAdicionarProdutoClick
     end
     object btnExcluirProduto: TSpeedButton
-      Left = 303
-      Top = 74
-      Width = 25
+      Left = 323
+      Top = 92
+      Width = 90
       Height = 25
       Hint = 'Clique aqui para excluir o produto'
+      Caption = '&Remover'
       Enabled = False
       Glyph.Data = {
         B60D0000424DB60D000000000000360000002800000030000000180000000100
@@ -456,117 +459,20 @@ object frmPrincipal: TfrmPrincipal
       NumGlyphs = 2
       OnClick = btnExcluirProdutoClick
     end
-    object lblProduto: TLabel
-      Left = 158
-      Top = 18
-      Width = 254
-      Height = 32
-      AutoSize = False
-      Caption = 
-        '1234567890123456789012345678901234567890123456789012345678901234' +
-        '567890123456789012345678901234567890'
-      WordWrap = True
+    object Label3: TLabel
+      Left = 112
+      Top = 27
+      Width = 43
+      Height = 15
+      Caption = 'Produto'
     end
-    object edtCodProduto: TEdit
-      Left = 53
-      Top = 19
-      Width = 60
-      Height = 23
-      MaxLength = 10
-      NumbersOnly = True
-      TabOrder = 0
-      OnKeyDown = edtCodClienteKeyDown
-    end
-    object edtQuantidade: TEdit
-      Left = 53
-      Top = 76
-      Width = 62
-      Height = 23
-      Alignment = taRightJustify
-      TabOrder = 1
-      Text = '0'
-    end
-    object edtPrecoUnitario: TEdit
-      Left = 158
-      Top = 77
-      Width = 71
-      Height = 23
-      Alignment = taRightJustify
-      NumbersOnly = True
-      TabOrder = 2
-      Text = '0,00'
-    end
-  end
-  object GridProdutos: TDBGrid
-    Left = 0
-    Top = 163
-    Width = 427
-    Height = 127
-    Align = alClient
-    DataSource = dsPedido
-    Options = [dgEditing, dgTitles, dgIndicator, dgColumnResize, dgColLines, dgRowLines, dgTabs, dgCancelOnExit, dgTitleClick, dgTitleHotTrack]
-    TabOrder = 2
-    TitleFont.Charset = DEFAULT_CHARSET
-    TitleFont.Color = clWindowText
-    TitleFont.Height = -12
-    TitleFont.Name = 'Segoe UI'
-    TitleFont.Style = []
-    OnKeyDown = GridProdutosKeyDown
-    Columns = <
-      item
-        Expanded = False
-        FieldName = 'Codigo_Produto'
-        ReadOnly = True
-        Title.Caption = 'C'#243'digo'
-        Width = 50
-        Visible = True
-      end
-      item
-        Expanded = False
-        FieldName = 'Produto'
-        ReadOnly = True
-        Width = 130
-        Visible = True
-      end
-      item
-        Expanded = False
-        FieldName = 'Quantidade'
-        Title.Caption = 'Qtd.'
-        Visible = True
-      end
-      item
-        Expanded = False
-        FieldName = 'Valor_Unitario'
-        Title.Alignment = taCenter
-        Title.Caption = 'Vlr Unit'#225'rio'
-        Visible = True
-      end
-      item
-        Expanded = False
-        FieldName = 'Valor_Total'
-        ReadOnly = True
-        Title.Alignment = taCenter
-        Title.Caption = 'Vlr Total'
-        Width = 80
-        Visible = True
-      end>
-  end
-  object Panel1: TPanel
-    Left = 0
-    Top = 290
-    Width = 427
-    Height = 33
-    Align = alBottom
-    BevelOuter = bvNone
-    TabOrder = 3
-    ExplicitWidth = 415
     object btnGravarPedido: TSpeedButton
-      Left = 0
-      Top = 0
-      Width = 427
-      Height = 33
+      Left = 2
+      Top = 126
+      Width = 412
+      Height = 25
       Hint = 'Clique aqui para gravar o pedido'
-      Align = alClient
+      Align = alBottom
       Caption = 'Gravar Pedido'
       Enabled = False
       Font.Charset = DEFAULT_CHARSET
@@ -688,13 +594,109 @@ object frmPrincipal: TfrmPrincipal
       NumGlyphs = 2
       ParentFont = False
       OnClick = btnGravarPedidoClick
-      ExplicitWidth = 415
+      ExplicitTop = 150
     end
+    object edtCodProduto: TEdit
+      Left = 10
+      Top = 46
+      Width = 60
+      Height = 23
+      MaxLength = 10
+      NumbersOnly = True
+      TabOrder = 0
+      OnKeyDown = edtCodProdutoKeyDown
+    end
+    object edtQuantidade: TEdit
+      Left = 10
+      Top = 94
+      Width = 62
+      Height = 23
+      Alignment = taRightJustify
+      TabOrder = 1
+      Text = '0'
+      OnKeyDown = edtQuantidadeKeyDown
+    end
+    object edtPrecoUnitario: TEdit
+      Left = 112
+      Top = 94
+      Width = 71
+      Height = 23
+      Alignment = taRightJustify
+      NumbersOnly = True
+      TabOrder = 2
+      Text = '0,00'
+      OnKeyDown = edtPrecoUnitarioKeyDown
+    end
+    object edtNomeProduto: TEdit
+      Left = 112
+      Top = 46
+      Width = 301
+      Height = 23
+      TabStop = False
+      MaxLength = 100
+      ReadOnly = True
+      TabOrder = 3
+    end
+  end
+  object GridProdutos: TDBGrid
+    Left = 0
+    Top = 210
+    Width = 416
+    Height = 177
+    Align = alClient
+    DataSource = dsPedido
+    Options = [dgEditing, dgTitles, dgIndicator, dgColumnResize, dgColLines, dgRowLines, dgTabs, dgCancelOnExit, dgTitleClick, dgTitleHotTrack]
+    TabOrder = 2
+    TitleFont.Charset = DEFAULT_CHARSET
+    TitleFont.Color = clWindowText
+    TitleFont.Height = -12
+    TitleFont.Name = 'Segoe UI'
+    TitleFont.Style = []
+    OnKeyDown = GridProdutosKeyDown
+    Columns = <
+      item
+        Alignment = taCenter
+        Expanded = False
+        FieldName = 'Codigo_Produto'
+        ReadOnly = True
+        Title.Caption = 'C'#243'digo'
+        Width = 50
+        Visible = True
+      end
+      item
+        Expanded = False
+        FieldName = 'Produto'
+        ReadOnly = True
+        Width = 130
+        Visible = True
+      end
+      item
+        Expanded = False
+        FieldName = 'Quantidade'
+        Title.Caption = 'Qtd.'
+        Visible = True
+      end
+      item
+        Expanded = False
+        FieldName = 'Valor_Unitario'
+        Title.Alignment = taCenter
+        Title.Caption = 'Vlr Unit'#225'rio'
+        Visible = True
+      end
+      item
+        Expanded = False
+        FieldName = 'Valor_Total'
+        ReadOnly = True
+        Title.Alignment = taCenter
+        Title.Caption = 'Vlr Total'
+        Width = 80
+        Visible = True
+      end>
   end
   object StatusBar1: TStatusBar
     Left = 0
-    Top = 323
-    Width = 427
+    Top = 387
+    Width = 416
     Height = 19
     Panels = <
       item
@@ -702,8 +704,8 @@ object frmPrincipal: TfrmPrincipal
         Text = 'Valor total : 0,00'
         Width = 500
       end>
-    ExplicitLeft = -8
-    ExplicitWidth = 415
+    ExplicitTop = 315
+    ExplicitWidth = 425
   end
   object dsPedido: TDataSource
     DataSet = tblPedido
